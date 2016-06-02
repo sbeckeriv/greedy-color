@@ -1,0 +1,11 @@
+[package]
+name = "hash_color"
+version = "0.1.0"
+authors = ["Stephen Becker IV <github@deathbyescalator.com>"]
+
+[dependencies]
+ruru = ">= 0.5.0"
+
+[lib]
+crate-type = ["dylib"]
+
