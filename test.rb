@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bundler/setup'
 Bundler.require
 require 'fiddle'
+require 'benchmark'
 library = Fiddle.dlopen(File.join(File.dirname(__FILE__),'target','release','libhash_color.dylib'))
 
 Fiddle::Function.new(library['initialize_rust_color'], [], Fiddle::TYPE_VOIDP).call
@@ -19,5 +20,26 @@ CSV.foreach(File.join(File.dirname(__FILE__),"county_adjacency.txt"), :encoding 
   hash[current].push(row[3].to_i) unless row[3].to_i == current
 }
 #pp hash
-colored = hash.greedy_color
-hash.each{|k,v| puts "#{k}:#{colored[k]} => #{v.map{|x| colored[x]}.inspect},"}
+class Hash
+  def greedy
+    colors = Set::new
+    colored = Hash::new
+    self.each{|k,v|
+      colors_used = Set::new
+      v.map{|c| colors_used.add(colored[c]) if colored[c]}
+      first = (colors-colors_used).first
+      unless first
+        first = colors.size+1
+        colors.add(first)
+      end
+      colored[k]=first
+    }
+    colored
+  end
+end
+
+n = 500
+Benchmark.bmbm do |x|
+  x.report("ruby:") { for i in 1..n; hash.greedy ; end }
+  x.report("rust:") { for i in 1..n; hash.greedy_color ; end }
+end
