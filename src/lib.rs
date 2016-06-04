@@ -16,13 +16,10 @@ pub extern fn initialize_rust_color() {
             let mut colors = HashSet::new();
             let mut colored: HashMap<i64, usize> = HashMap::new();
             let keys = itself.send("keys", vec![]).to::<Array>();
-            let mut debug = false;
             for x in 0..keys.send("length", vec![]).to::<Fixnum>().to_i64() {
-
                 let key = keys.at(x).to::<Fixnum>();
-                let list = itself.at(key).to::<Array>();
                 let num_key = keys.at(x).to::<Fixnum>().to_i64();
-                let key = keys.at(x).to::<Fixnum>();
+                let list = itself.at(key).to::<Array>(); // consumes key?
                 let mut used_colors = HashSet::new();
 
                 for y in  0..list.send("length", vec![]).to::<Fixnum>().to_i64() {
@@ -34,14 +31,15 @@ pub extern fn initialize_rust_color() {
                         _ => {}
                     }
                 }
+
                 match colors.difference(&used_colors).cloned().nth(0){
                     None =>{
                         let next_color = colors.len()+1;
-                        colored.insert(key.to_i64(), next_color);
+                        colored.insert(num_key, next_color);
                         colors.insert(next_color);
                     }
                     Some(next_color) =>{
-                        colored.insert(key.to_i64(), next_color);
+                        colored.insert(num_key, next_color);
                     }
                 }
             }
