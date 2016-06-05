@@ -37,8 +37,10 @@ class Hash
     colored
   end
 end
-
-n = 500
+#colored = hash.greedy_color
+#hash.each{|k,v| puts "#{k}:#{colored[k]} => #{v.map{|x| colored[x]}.inspect},"}
+puts "#{hash.size} nodes"
+n = 5000
 Benchmark.bmbm do |x|
   x.report("ruby:") { for i in 1..n; hash.greedy ; end }
   x.report("rust:") { for i in 1..n; hash.greedy_color ; end }
