@@ -14,36 +14,35 @@ pub extern fn initialize_rust_color() {
 
         fn greedy_color() -> Hash {
             let mut colors = HashSet::new();
-            let mut colored: HashMap<i64, usize> = HashMap::new();
             let mut ruby_hash = Hash::new();
-            let keys = itself.send("keys", vec![]).to::<Array>();
-            for x in 0..keys.send("length", vec![]).to::<Fixnum>().to_i64() {
-                let key = keys.at(x).to::<Fixnum>();
-                let num_key = keys.at(x).to::<Fixnum>().to_i64();
+            let hash_keys = itself.send("keys", vec![]).to::<Array>();
+
+            for hash_index in 0..hash_keys.send("length", vec![]).to::<Fixnum>().to_i64() {
+                let key = hash_keys.at(hash_index).to::<Fixnum>();
                 let list = itself.at(key).to::<Array>(); // consumes key?
+
+                let hash_key = hash_keys.at(hash_index);
                 let mut used_colors = HashSet::new();
 
-                for y in  0..list.send("length", vec![]).to::<Fixnum>().to_i64() {
-                    let color_key = list.at(y).to::<Fixnum>();
+                for list_index in  0..list.send("length", vec![]).to::<Fixnum>().to_i64() {
+                    let color_key = list.at(list_index);
                     let color = ruby_hash.at(color_key);
                     if !color.value().is_nil(){
                         let col=color.to::<Fixnum>().to_i64();
                         used_colors.insert(col);
                     }
                 }
-
                 match colors.difference(&used_colors).cloned().nth(0){
                     None =>{
                         let next_color = (colors.len()+1) as i64;
-                        ruby_hash.store(Fixnum::new(num_key), Fixnum::new(next_color));
+                        ruby_hash.store(hash_key, Fixnum::new(next_color));
                         colors.insert(next_color);
                     }
                     Some(next_color) =>{
-                        ruby_hash.store(Fixnum::new(num_key), Fixnum::new(next_color));
+                        ruby_hash.store(hash_key, Fixnum::new(next_color));
                     }
                 }
             }
-
             ruby_hash
         }
     );
