@@ -45,7 +45,7 @@ puts "#{hash.size} nodes"
 #strings = {"a"=>["b","c"], "b"=>["a","c"], "c"=>["a"]}
 #pp strings.greedy_color
 
-n = 5
+n = 500
 Benchmark.bmbm do |x|
   x.report("ruby:") { for i in 1..n; hash.greedy ; end }
   x.report("rust:") { for i in 1..n; hash.greedy_color ; end }
