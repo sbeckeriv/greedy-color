@@ -3,6 +3,8 @@ require 'bundler/setup'
 Bundler.require
 require 'fiddle'
 require 'benchmark'
+require "test/unit"
+extend Test::Unit::Assertions
 
 library = Fiddle.dlopen(File.join(File.dirname(__FILE__),'target','release','libhash_color.dylib'))
 Fiddle::Function.new(library['initialize_rust_color'], [], Fiddle::TYPE_VOIDP).call
@@ -42,8 +44,8 @@ end
 #hash.each{|k,v| puts "#{k}:#{colored[k]} => #{v.map{|x| colored[x]}.inspect},"}
 puts "#{hash.size} nodes"
 #n = 5000
-#strings = {"a"=>["b","c"], "b"=>["a","c"], "c"=>["a"]}
-#pp strings.greedy_color
+strings = {"a"=>["b","c"], "b"=>["a"], "c"=>["a"]}
+assert_equal strings.greedy_color, strings.greedy
 
 n = 500
 Benchmark.bmbm do |x|

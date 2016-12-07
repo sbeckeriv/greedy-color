@@ -3,11 +3,11 @@ extern crate ruru;
 use ruru::{AnyObject, Boolean, Class, Fixnum, Hash, VM, Array};
 use ruru::Object;
 use ruru::types::Argc;
-
 use std::collections::{HashSet, HashMap};
+
 // Really from the examples
 #[no_mangle]
-pub extern fn initialize_rust_color() {
+pub extern "C" fn initialize_rust_color() {
     methods!(
         Hash, // type of `self` object
         itself, // name of `self` object which will be used in methods
@@ -17,14 +17,18 @@ pub extern fn initialize_rust_color() {
             let mut ruby_hash = Hash::new();
             itself.each(|key,list|{
                 let mut used_colors = HashSet::new();
-                let list = list.try_convert_to::<Array>();
-                for color_key in list {
+                let array_list = list.try_convert_to::<Array>();
+                // why the double array here?
+                for x in array_list {
+                    for color_key in x{
                     let color = ruby_hash.at(color_key);
-                    if !color.value().is_nil(){
+                    if !color.is_nil(){
                         let col=unsafe{color.to::<Fixnum>().to_i64()};
                         used_colors.insert(col);
                     }
+                    }
                 }
+
                 match colors.difference(&used_colors).cloned().nth(0){
                     None =>{
                         let next_color = (colors.len()+1) as i64;
